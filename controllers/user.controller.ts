@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import userModel, { IUser } from "../models/user.model";
 import ErrorHandler from "../utils/ErrorHandler";
 import { CatchAsyncError } from "../middleware/catchAsyncErrors";
-import jwt, { Secret } from "jsonwebtoken";
+import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 import { sendMail } from "../utils/sendMail";
 import { sendToken } from "../utils/jwt";
 import { redis } from "../utils/redis";
@@ -142,3 +142,37 @@ export const logoutUser = CatchAsyncError(
       }
     }
 );
+
+export const updateAccessToken = CatchAsyncError(
+    async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const refresh_token = req.headers["refresh-token"] as string;
+        const decoded = jwt.verify(
+            refresh_token,
+            process.env.REFRESH_TOKEN as string
+          ) as JwtPayload;
+  
+        const message = "Không thể làm mới mã thông báo";
+        if (!decoded) {
+          return next(new ErrorHandler(message, 400));
+        }
+        const session = await redis.get(decoded.id as string);
+  
+        if (!session) {
+          return next(
+            new ErrorHandler("Vui lòng đăng nhập để truy cập tài nguyên này!", 400)
+          );
+        }
+  
+        const user = JSON.parse(session);
+  
+        req.user = user;
+  
+        await redis.set(user._id, JSON.stringify(user), "EX", 604800); // 7days
+  
+        return next();
+      } catch (error: any) {
+        return next(new ErrorHandler(error.message, 400));
+      }
+    }
+  );
