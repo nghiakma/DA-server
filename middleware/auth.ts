@@ -3,7 +3,7 @@ import ErrorHandler from "../utils/ErrorHandler"
 import { CatchAsyncError } from "./catchAsyncErrors";
 import jwt,{ JwtPayload } from "jsonwebtoken";
 
-export const isAuthenticated = CatchAsyncError(
+export const isAutheticated = CatchAsyncError(
     async (req: Request, res: Response, next: NextFunction) => {
         const access_token = req.cookies.accessToken;
         if(!access_token){
