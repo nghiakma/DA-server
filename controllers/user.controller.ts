@@ -6,7 +6,7 @@ import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 import { sendMail } from "../utils/sendMail";
 import { sendToken } from "../utils/jwt";
 import { redis } from "../utils/redis";
-import { getUserById } from "../services/user.service";
+import { getAllUsersService, getUserById } from "../services/user.service";
 
 
 export const registrationUser = CatchAsyncError(
@@ -246,6 +246,16 @@ export const updatePassword = CatchAsyncError(
           success: true,
           user,
         });
+      } catch (error: any) {
+        return next(new ErrorHandler(error.message, 400));
+      }
+    }
+);
+
+export const getAllUsers = CatchAsyncError(
+    async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        getAllUsersService(res);
       } catch (error: any) {
         return next(new ErrorHandler(error.message, 400));
       }
