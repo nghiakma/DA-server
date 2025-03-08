@@ -87,24 +87,31 @@ userSchema.pre<IUser>("save", async function (next) {
     next();
 });
 
+
+/**
+ * Phương thức để so sánh mật khẩu người dùng đã nhập với mật khẩu đã được lưu trữ.
+ * 
+ * @param enteredPassword - Mật khẩu người dùng đã nhập.
+ * @returns Một Promise trả về true nếu mật khẩu khớp, ngược lại trả về false.
+ */
 userSchema.methods.comparePassword = async function (
     enteredPassword: string
   ): Promise<boolean> {
     return await bcrypt.compare(enteredPassword, this.password);
   };
 
-  userSchema.methods.SignAccessToken = function () {
+userSchema.methods.SignAccessToken = function () {
     return jwt.sign({ id: this._id }, process.env.ACCESS_TOKEN || "", {
       expiresIn: "5m",
     });
-  };
+};
   
   
-  userSchema.methods.SignRefreshToken = function () {
+userSchema.methods.SignRefreshToken = function () {
     return jwt.sign({ id: this._id }, process.env.REFRESH_TOKEN || "", {
       expiresIn: "3d",
     });
-  };
+};
 
 const userModel: Model<IUser> = mongoose.model("User", userSchema);
 
