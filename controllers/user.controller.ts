@@ -1,13 +1,8 @@
-import { Message } from './../node_modules/chromium-bidi/lib/cjs/protocol/generated/webdriver-bidi.d';
-import dotenv from "dotenv";
-dotenv.config();
 import { Request, Response, NextFunction } from "express";
 import userModel, { IUser } from "../models/user.model";
 import ErrorHandler from "../utils/ErrorHandler";
 import { CatchAsyncError } from "../middleware/catchAsyncErrors";
-import ejs from "ejs";
-import jwt, { JwtPayload, Secret } from "jsonwebtoken";
-import path from "path";
+import jwt, { Secret } from "jsonwebtoken";
 import { sendMail } from "../utils/sendMail";
 
 

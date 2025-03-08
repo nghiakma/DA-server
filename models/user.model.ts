@@ -1,9 +1,7 @@
-import { isEmail } from './../node_modules/@types/validator/index.d';
-import dotenv from "dotenv";
-dotenv.config();
 import mongoose, {Document, Model, Schema} from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { isEmail } from "validator";
 export interface IUser extends Document {
   name: string;
   email: string;
