@@ -11,8 +11,8 @@ export interface IUser extends Document {
   };
   role: string;
   isVerified: boolean;
-  courses: Array<{ courseId: string }>;
-  cart: Array<{ courseId: string }>;
+  courses: Array<{ courseId: mongoose.Schema.Types.ObjectId }>;
+  cart: Array<{ courseId: mongoose.Schema.Types.ObjectId }>;
   comparePassword: (password: string) => Promise<boolean>;
   SignAccessToken: () => string;
   SignRefreshToken: () => string;
