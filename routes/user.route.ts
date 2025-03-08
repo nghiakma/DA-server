@@ -1,6 +1,7 @@
 import express from "express";
 import {
     activeUser,
+    getUserInfo,
     loginUser,
     logoutUser,
     registrationUser
@@ -13,3 +14,4 @@ userRouter.post("/registration", registrationUser);
 userRouter.post("/activate-user", activeUser);
 userRouter.post("/login", loginUser);
 userRouter.get("/logout", isAutheticated, logoutUser);
+userRouter.get("/me", isAutheticated, getUserInfo);
