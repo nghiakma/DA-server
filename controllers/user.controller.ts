@@ -4,6 +4,7 @@ import ErrorHandler from "../utils/ErrorHandler";
 import { CatchAsyncError } from "../middleware/catchAsyncErrors";
 import jwt, { Secret } from "jsonwebtoken";
 import { sendMail } from "../utils/sendMail";
+import { sendToken } from "../utils/jwt";
 
 
 export const registrationUser = CatchAsyncError(
@@ -98,3 +99,29 @@ export const activeUser = CatchAsyncError(
             return next(new ErrorHandler(error.message, 400));
         }
 })
+
+export const loginUser = CatchAsyncError(
+    async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const { email, password } = req.body;
+        console.log(email, password);
+        if (!email || !password) {
+          return next(new ErrorHandler("Vui lòng nhập email và password", 400));
+        }
+  
+        const user = await userModel.findOne({ email }).select("+password");
+  
+        if (!user) {
+          return next(new ErrorHandler("Email hoặc mật khẩu không hợp lệ", 400));
+        }
+        const isPasswordMatch = await user.comparePassword(password);
+        if (!isPasswordMatch) {
+          return next(new ErrorHandler("Email hoặc mật khẩu không hợp lệ", 400));
+        }
+        sendToken(user, 200, res);
+      } catch (error: any) {
+        return next(new ErrorHandler(error.message, 400));
+      }
+    }
+  );
+  
