@@ -1,6 +1,7 @@
 import { Response } from "express";
 import { IUser } from "../models/user.model";
 import dotenv from "dotenv";
+import { redis } from "./redis";
 dotenv.config();
 
 interface ITokenOptions {
@@ -36,3 +37,17 @@ export const refreshTokenOptions: ITokenOptions = {
     sameSite: "none",
     secure: true,
 };
+
+export const sendToken = (user: IUser, statusCode: number, res: Response) => {
+    const accessToken = user.SignAccessToken();
+    const refreshToken = user.SignRefreshToken();
+    // Lưu trữ phiên làm việc vào token
+    redis.set(user._id as any, JSON.stringify(user) as any);
+    return res.status(statusCode).json({
+      success: true,
+      user,
+      accessToken,
+      refreshToken,
+    });
+  };
+  
