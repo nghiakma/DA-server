@@ -6,7 +6,7 @@ import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 import { sendMail } from "../utils/sendMail";
 import { sendToken } from "../utils/jwt";
 import { redis } from "../utils/redis";
-import { getAllUsersService, getUserById } from "../services/user.service";
+import { getAllUsersService, getUserById, updateUserRoleService } from "../services/user.service";
 import path from "path";
 import fs from "fs";
 
@@ -329,6 +329,26 @@ export const deleteUser = CatchAsyncError(
           success: true,
           message: "Người dùng đã xóa thành công",
         });
+      } catch (error: any) {
+        return next(new ErrorHandler(error.message, 400));
+      }
+    }
+  );
+
+export const updateUserRole = CatchAsyncError(
+    async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const { email, role } = req.body;
+        const isUserExist = await userModel.findOne({ email });
+        if (isUserExist) {
+          const id = isUserExist._id;
+          updateUserRoleService(res, id as any, role);
+        } else {
+          res.status(400).json({
+            success: false,
+            message: "Không tìm thấy người dùng",
+          });
+        }
       } catch (error: any) {
         return next(new ErrorHandler(error.message, 400));
       }

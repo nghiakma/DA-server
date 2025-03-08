@@ -9,7 +9,8 @@ import {
     registrationUser,
     updatePassword,
     updateProfilePicture,
-    updateUserInfo
+    updateUserInfo,
+    updateUserRole
 } from "../controllers/user.controller";
 import { isAutheticated,authorizeRoles } from "../middleware/auth";
 import { upload } from "../utils/multer";
@@ -36,3 +37,10 @@ userRouter.delete(
     authorizeRoles("admin"),
     deleteUser
   );
+userRouter.put(
+    "/update-user",
+    isAutheticated,
+    authorizeRoles("admin"),
+    updateUserRole
+);
+  
