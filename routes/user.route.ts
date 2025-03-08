@@ -4,7 +4,8 @@ import {
     getUserInfo,
     loginUser,
     logoutUser,
-    registrationUser
+    registrationUser,
+    updateUserInfo
 } from "../controllers/user.controller";
 import { isAutheticated,authorizeRoles } from "../middleware/auth";
 
@@ -15,3 +16,4 @@ userRouter.post("/activate-user", activeUser);
 userRouter.post("/login", loginUser);
 userRouter.get("/logout", isAutheticated, logoutUser);
 userRouter.get("/me", isAutheticated, getUserInfo);
+userRouter.put("/update-user-info", isAutheticated, updateUserInfo);

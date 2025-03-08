@@ -147,7 +147,7 @@ export const logoutUser = CatchAsyncError(
 export const updateAccessToken = CatchAsyncError(
     async (req: Request, res: Response, next: NextFunction) => {
       try {
-        const refresh_token = req.headers["refresh-token"] as string;
+        const refresh_token = req.cookies.refreshToken;
         const decoded = jwt.verify(
             refresh_token,
             process.env.REFRESH_TOKEN as string
@@ -188,3 +188,29 @@ export const getUserInfo = CatchAsyncError(
       }
     }
 )
+
+export const updateUserInfo = CatchAsyncError(
+    async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const { name } = req.body ;
+  
+        const userId = req.user?._id as any;
+        const user = await userModel.findById(userId);
+  
+        if (name && user) {
+          user.name = name;
+        }
+  
+        await user?.save();
+  
+        await redis.set(userId, JSON.stringify(user));
+  
+        res.status(201).json({
+          success: true,
+          user,
+        });
+      } catch (error: any) {
+        return next(new ErrorHandler(error.message, 400));
+      }
+    }
+);
