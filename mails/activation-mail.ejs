@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ELearning Activation Email</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style type="text/css">
+      /* Base */
+      body {
+        margin: 0;
+        padding: 0;
+        min-width: 100%;
+        font-family: 'Arial', sans-serif;
+        font-size: 16px;
+        line-height: 1.6;
+        background-color: #f7f9fc;
+        color: #333333;
+      }
+      a {
+        color: #0070f3;
+        text-decoration: none;
+        font-weight: 600;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      h1 {
+        font-size: 28px;
+        font-weight: 700;
+        line-height: 1.3;
+        margin-top: 0;
+        margin-bottom: 20px;
+        text-align: center;
+        color: #ffffff;
+      }
+      h2 {
+        font-size: 24px;
+        font-weight: 600;
+        line-height: 1.4;
+        margin-top: 0;
+        margin-bottom: 20px;
+        text-align: center;
+        color: #0070f3;
+        background-color: #e6f0ff;
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #0070f3;
+      }
+      p {
+        margin-top: 0;
+        margin-bottom: 20px;
+        font-size: 16px;
+        color: #555555;
+      }
+
+      /* Layout */
+      .email-wrapper {
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: #ffffff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+      }
+      .email-header {
+        background-color: #0070f3;
+        padding: 32px 24px;
+        color: #ffffff;
+        text-align: center;
+      }
+      .email-body {
+        padding: 32px 24px;
+        background-color: #ffffff;
+      }
+      .email-footer {
+        background-color: #f7f9fc;
+        padding: 24px;
+        text-align: center;
+        font-size: 14px;
+        color: #666666;
+        border-top: 1px solid #e0e0e0;
+      }
+
+      /* Button */
+      .activation-code {
+        display: inline-block;
+        margin: 20px 0;
+        padding: 15px 30px;
+        font-size: 20px;
+        font-weight: 600;
+        color: #0070f3;
+        background-color: #e6f0ff;
+        border-radius: 8px;
+        border: 2px solid #0070f3;
+        text-align: center;
+      }
+
+      /* Responsive */
+      @media (max-width: 600px) {
+        .email-wrapper {
+          border-radius: 0;
+        }
+        .email-header {
+          padding: 24px 16px;
+        }
+        .email-body {
+          padding: 24px 16px;
+        }
+        .email-footer {
+          padding: 16px;
+        }
+        h1 {
+          font-size: 24px;
+        }
+        h2 {
+          font-size: 20px;
+        }
+        p {
+          font-size: 14px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="email-wrapper">
+      <div class="email-header">
+        <h1>Chào mừng bạn</h1>
+      </div>
+      <div class="email-body">
+        <p>Xin chào <strong><%= user.name %></strong>,</p>
+        <p>Cảm ơn bạn đã đăng ký tài khoản tại ELearning. Để kích hoạt tài khoản của bạn, vui lòng sử dụng mã kích hoạt sau:</p>
+        <div class="activation-code"><%= activationCode %></div>
+        <p>Vui lòng nhập mã này vào trang kích hoạt trong vòng <strong>5 phút</strong> tới.</p>
+        <p>Nếu bạn không thực hiện đăng ký này, vui lòng bỏ qua email này.</p>
+      </div>
+      <div class="email-footer">
+        <p>Nếu bạn có bất kỳ câu hỏi nào, đừng ngần ngại liên hệ với chúng tôi qua email <a href="mailto:lam47788@gmail.com">lam47788@gmail.com</a>.</p>
+        <p>&copy; 2023 ELearning. All rights reserved.</p>
+      </div>
+    </div>
+  </body>
+</html>
