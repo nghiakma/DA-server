@@ -5,6 +5,7 @@ import { CatchAsyncError } from "../middleware/catchAsyncErrors";
 import jwt, { Secret } from "jsonwebtoken";
 import { sendMail } from "../utils/sendMail";
 import { sendToken } from "../utils/jwt";
+import { redis } from "../utils/redis";
 
 
 export const registrationUser = CatchAsyncError(
@@ -125,3 +126,19 @@ export const loginUser = CatchAsyncError(
     }
   );
   
+export const logoutUser = CatchAsyncError(
+    async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        res.cookie("access_token", "", { maxAge: 1 });
+        res.cookie("refresh_token", "", { maxAge: 1 });
+        const userId = req.user?._id || "";
+        redis.del(userId.toString());
+        res.status(200).json({
+          success: true,
+          message: "Đăng xuất thành công",
+        });
+      } catch (error: any) {
+        return next(new ErrorHandler(error.message, 400));
+      }
+    }
+);
