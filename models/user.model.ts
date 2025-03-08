@@ -71,6 +71,12 @@ const userSchema: Schema<IUser> = new mongoose.Schema(
     }
 );
 
+/**
+ * Middleware to hash mật khẩu của user trước khi lưu vào db
+ * This middleware được kích hoạt khi trường mật khẩu thay đổi
+ * This: đang nói đến document đang được lưu
+ * @param next - The next middleware trong stack
+ */
 userSchema.pre<IUser>("save", async function (next) {
     if (!this.isModified("password")) {
       next();
@@ -78,3 +84,9 @@ userSchema.pre<IUser>("save", async function (next) {
     this.password = await bcrypt.hash(this.password, 10);
     next();
 });
+
+userSchema.methods.comparePassword = async function (
+    enteredPassword: string
+  ): Promise<boolean> {
+    return await bcrypt.compare(enteredPassword, this.password);
+  };
