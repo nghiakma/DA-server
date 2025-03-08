@@ -7,6 +7,9 @@ import { sendMail } from "../utils/sendMail";
 import { sendToken } from "../utils/jwt";
 import { redis } from "../utils/redis";
 import { getAllUsersService, getUserById } from "../services/user.service";
+import path from "path";
+import fs from "fs";
+
 
 
 export const registrationUser = CatchAsyncError(
@@ -261,3 +264,48 @@ export const getAllUsers = CatchAsyncError(
       }
     }
 );
+
+export const updateProfilePicture = CatchAsyncError(
+    async (req: Request, res: Response, next: NextFunction) => {
+      try {
+  
+        const userId = req.user?._id as any;
+  
+        const user = await userModel.findById(userId).select("+password");
+  
+        const image = req.file;
+  
+        if (user) {
+  
+          if (user?.avatar?.url) {
+  
+            const oldImagePath = path.join(__dirname, '../uploads/images', user?.avatar?.url);
+            if (fs.existsSync(oldImagePath)) {
+              fs.unlinkSync(oldImagePath);
+              console.log('Đã xóa ảnh cũ:', oldImagePath);
+            }
+            user.avatar = {
+              url: image?.filename as any,
+            };
+  
+          } else {
+            user.avatar = {
+              url: image?.filename as any,
+            };
+          }
+        }
+  
+        await user?.save();
+  
+        await redis.set(userId, JSON.stringify(user));
+        console.log(user?.avatar.url);
+        res.status(200).json({
+          success: true,
+          user,
+        });
+      } catch (error: any) {
+        console.log(error);
+        return next(new ErrorHandler(error.message, 400));
+      }
+    }
+  );
