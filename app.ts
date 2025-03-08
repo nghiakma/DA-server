@@ -3,6 +3,7 @@ export const app = express();
 import cors from "cors";
 import { rateLimit } from "express-rate-limit";
 import cookieParser from "cookie-parser";
+import { ErrorMiddleware } from "./middleware/error";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -29,15 +30,11 @@ app.options('*', cors({
     origin: 'http://localhost:3000',
     credentials: true,
 }));
-class AppError extends Error {
-    statusCode: number;
-    constructor(message: string, statusCode: number) {
-        super(message);
-        this.statusCode = statusCode;
-    }
-}
+
 
 app.all("*", (req: Request, res: Response, next: NextFunction) => {
-    const err = new AppError(`Đường dẫn ${req.originalUrl} không tìm thấy`, 404);
+    const err = new Error(`Đường dẫn ${req.originalUrl} không tìm thấy`) as any;
+    err.statusCode = 404;
     next(err);
-})
+  });
+  
