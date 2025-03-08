@@ -15,7 +15,7 @@ export const registrationUser = CatchAsyncError(
     async (req: Request, res: Response, next: NextFunction) => {
      try {
         const {email} = req.body;
-        
+
         const isEmailExist = await userModel.findOne({email});
   
         if(isEmailExist){
@@ -78,3 +78,28 @@ export const createActivationToken = (user: IUser): IActivationToken => {
 
   return { token, activationCode };
 };
+
+export const activeUser = CatchAsyncError(
+    async (req: Request, res: Response, next: NextFunction) => {
+      
+        try{
+            const { activation_token, activation_code } = req.body;
+
+            const newUser: { user: IUser; activationCode: string } = jwt.verify(
+                activation_token,
+                process.env.ACTIVATION_SECRET as string
+              ) as { user: IUser; activationCode: string };
+
+            if (newUser.activationCode !== activation_code) {
+                return next(new ErrorHandler("Mã kích hoạt không hợp lệ", 400));
+              }
+
+            await userModel.create(newUser.user);
+
+            res.status(201).json({
+                success:true
+            })
+        }catch(error: any){
+            return next(new ErrorHandler(error.message, 400));
+        }
+})
