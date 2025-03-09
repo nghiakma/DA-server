@@ -24,16 +24,13 @@ app.use(express.json({limit: "100mb"}));
 app.use(express.static('uploads'));
 app.use(cookieParser());
 app.use(limiter);
-app.use(cors({
-    origin: '*',
-    methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
-    credentials: true,
-    allowedHeaders: '*'
-}));
-app.options('*', cors({
-    origin: 'http://localhost:3000',
-    credentials: true,
-}));
+
+const corsOptions = {
+  origin: 'http://localhost:3000',
+  credentials: true,
+};
+// cors => cross origin resource sharing
+app.use(cors(corsOptions));
 app.use("/api/v1", 
     userRouter,
     notificationRoute,

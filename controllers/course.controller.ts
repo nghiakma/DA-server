@@ -17,6 +17,10 @@ export const uploadCourse = CatchAsyncError(
       const demo = files.demo?.[0];
       const videos = files.videos;
 
+      console.log(image)
+      console.log(demo)
+      console.log(videos)
+
       const course = JSON.parse(data.courseData)
       course.thumbnail = {
         // public_id: image?.mimetype,
