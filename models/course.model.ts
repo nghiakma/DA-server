@@ -1,7 +1,43 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
-import { ICourseData } from "./courseData.mode";
-import { IReview } from "./review.model";
+import { IUser } from "./user.model";
 
+export interface IComment extends Document {
+  user: IUser;
+  question: string;
+  questionReplies: IComment[];
+}
+
+export interface IReview extends Document {
+  user: IUser;
+  rating?: number;
+  comment: string;
+  commentReplies?: IReview[];
+}
+
+interface ILink extends Document {
+  title: string;
+  url: string;
+}
+
+interface IQuizz extends Document {
+  question: string;
+  options: string[];
+  correctAnswer: string;
+}
+
+interface ICourseData extends Document {
+  title: string;
+  description: string;
+  videoUrl: string;
+  videoThumbnail: object;
+  videoSection: string;
+  videoLength: number;
+  videoPlayer: string;
+  links: ILink[];
+  suggestion: string;
+  iquizz: IQuizz[];
+  questions: IComment[];
+}
 
 export interface ICourse extends Document {
   name: string;
@@ -21,6 +57,46 @@ export interface ICourse extends Document {
   purchased: number;
 }
 
+const reviewSchema = new Schema<IReview>({
+  user: Object,
+  rating: {
+    type: Number,
+    default: 0,
+  },
+  comment: String,
+  commentReplies: [Object],
+}, { timestamps: true });
+
+const linkSchema = new Schema<ILink>({
+  title: String,
+  url: String,
+});
+
+const iquizzSchema = new Schema<IQuizz>({
+  question: String, // Không bắt buộc
+  options: [String], // Không bắt buộc
+  correctAnswer: String, // Không bắt buộc
+});
+
+const commentSchema = new Schema<IComment>({
+  user: Object,
+  question: String,
+  questionReplies: [Object],
+}, { timestamps: true });
+
+const courseDataSchema = new Schema<ICourseData>({
+  videoUrl: String,
+  videoThumbnail: Object,
+  title: String,
+  videoSection: String,
+  description: String,
+  videoLength: Number,
+  videoPlayer: String,
+  links: [linkSchema],
+  suggestion: String,
+  iquizz: [iquizzSchema], // Không bắt buộc
+  questions: [commentSchema],
+});
 
 export const courseSchema = new Schema<ICourse>({
   name: {
@@ -61,18 +137,8 @@ export const courseSchema = new Schema<ICourse>({
   },
   benefits: [{ title: String }],
   prerequisites: [{ title: String }],
-  reviews: [
-    {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Review",
-    }
-  ],
-  courseData: [
-    {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "CourseData",
-    }
-  ],
+  reviews: [reviewSchema],
+  courseData: [courseDataSchema],
   ratings: {
     type: Number,
     default: 0,

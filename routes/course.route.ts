@@ -4,7 +4,7 @@ import {
   uploadCourse,
 } from "../controllers/course.controller";
 import { authorizeRoles, isAutheticated } from "../middleware/auth";
-const courseRouter = express.Router();
+export const courseRouter = express.Router();
 
 courseRouter.post(
   "/create-course",
