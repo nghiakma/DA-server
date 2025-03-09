@@ -42,3 +42,18 @@ export const fetchWishListOfUser = CatchAsyncError(
         }
     }
 )
+
+export const deleteWishCourseFromWishListOfUser = CatchAsyncError(
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const { id } = req.query;
+            await wishlistModel.findByIdAndDelete(id);
+
+            return res.status(200).json({
+                success: true
+            })
+        } catch (error: any) {
+            return next(new ErrorHandler(error.message, 400));
+        }
+    }
+)
