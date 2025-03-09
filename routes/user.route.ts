@@ -7,6 +7,7 @@ import {
     loginUser,
     logoutUser,
     registrationUser,
+    updateAccessToken,
     updatePassword,
     updateProfilePicture,
     updateUserInfo,
@@ -21,6 +22,7 @@ userRouter.post("/registration", registrationUser);
 userRouter.post("/activate-user", activeUser);
 userRouter.post("/login", loginUser);
 userRouter.get("/logout", isAutheticated, logoutUser);
+userRouter.get("/refresh", updateAccessToken);
 userRouter.get("/me", isAutheticated, getUserInfo);
 userRouter.put("/update-user-info", isAutheticated, updateUserInfo);
 userRouter.put("/update-user-password", isAutheticated, updatePassword);
