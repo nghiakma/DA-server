@@ -5,15 +5,11 @@ import ErrorHandler from "../utils/ErrorHandler";
 
 // create course
 export const createCourse = CatchAsyncError(async(data:any,res:Response)=>{
-  try {
-    const course = await CourseModel.create(data);
-    res.status(201).json({
-      success: true,
-      course,
-    });
-  } catch (error: any) {
-    return next(new ErrorHandler(error.message, 400));
-  }
+  const course = await CourseModel.create(data);
+  res.status(201).json({
+      success:true,
+      course
+  });
 })
 
 // Get All Courses
@@ -25,8 +21,3 @@ export const getAllCoursesService = async (res: Response) => {
       courses,
     });
   };
-
-function next(arg0: any) {
-  throw new Error("Function not implemented.");
-}
-  
