@@ -4,7 +4,7 @@ import { CatchAsyncError } from "../middleware/catchAsyncErrors";
 import LayoutModel from "../models/layout.model";
 
 
-// create layout
+
 export const createLayout = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -49,4 +49,54 @@ export const createLayout = CatchAsyncError(
       return next(new ErrorHandler(error.message, 500));
     }
   }
+);
+
+
+export const editLayout = CatchAsyncError(
+    async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const { type } = req.body;
+
+        if (type === "FAQ") {
+          const { faq } = req.body;
+          const FaqItem = await LayoutModel.findOne({ type: "FAQ" });
+          const faqItems = await Promise.all(
+            faq.map(async (item: any) => {
+              return {
+                question: item.question,
+                answer: item.answer,
+              };
+            })
+          );
+          await LayoutModel.findByIdAndUpdate(FaqItem?._id, {
+            type: "FAQ",
+            faq: faqItems,
+          });
+        }
+        if (type === "Categories") {
+          const { categories } = req.body;
+          const categoriesData = await LayoutModel.findOne({
+            type: "Categories",
+          });
+          const categoriesItems = await Promise.all(
+            categories.map(async (item: any) => {
+              return {
+                title: item.title,
+              };
+            })
+          );
+          await LayoutModel.findByIdAndUpdate(categoriesData?._id, {
+            type: "Categories",
+            categories: categoriesItems,
+          });
+        }
+  
+        res.status(200).json({
+          success: true,
+          message: "Layout Updated successfully",
+        });
+      } catch (error: any) {
+        return next(new ErrorHandler(error.message, 500));
+      }
+    }
 );

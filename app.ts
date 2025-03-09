@@ -6,6 +6,7 @@ import { ErrorMiddleware } from "./middleware/error";
 import {userRouter} from "./routes/user.route";
 import { notificationRoute } from "./routes/notification.route"
 import dotenv from "dotenv";
+import { layoutRouter } from "./routes/layout.route";
 dotenv.config();
 
 export const app = express();
@@ -34,7 +35,8 @@ app.options('*', cors({
 }));
 app.use("/api/v1", 
     userRouter,
-    notificationRoute);
+    notificationRoute,
+    layoutRouter);
 
 app.all("*", (req: Request, res: Response, next: NextFunction) => {
     const err = new Error(`Đường dẫn ${req.originalUrl} không tìm thấy`) as any;
