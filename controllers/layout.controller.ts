@@ -93,7 +93,7 @@ export const editLayout = CatchAsyncError(
   
         res.status(200).json({
           success: true,
-          message: "Layout Updated successfully",
+          message: "Layout đã cập nhật thành công",
         });
       } catch (error: any) {
         return next(new ErrorHandler(error.message, 500));
