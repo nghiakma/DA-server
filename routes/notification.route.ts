@@ -6,7 +6,6 @@ export const notificationRoute = express.Router();
 notificationRoute.get(
     "/get-all-notifications",
     isAutheticated,
-    authorizeRoles("admin"),
     getNotifications
 );
 notificationRoute.post(

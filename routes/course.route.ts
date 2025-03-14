@@ -1,6 +1,11 @@
 import express from "express";
 import { upload } from "../utils/multer"
 import {
+  addAnwser,
+  addQuestion,
+  addReplyToReview,
+  addReview,
+  deleteCourse,
   editCourse,
   getAdminAllCourses,
   getAllCourses,
@@ -38,4 +43,23 @@ courseRouter.get(
   isAutheticated,
   authorizeRoles("admin"),
   getAdminAllCourses
+);
+
+courseRouter.put("/add-question", isAutheticated, addQuestion);
+
+courseRouter.put("/add-answer", isAutheticated, addAnwser);
+
+courseRouter.put("/add-review/:id", isAutheticated, addReview);
+
+courseRouter.put(
+  "/add-reply",
+  isAutheticated,
+  authorizeRoles("admin"),
+  addReplyToReview
+);
+courseRouter.delete(
+  "/delete-course/:id",
+  isAutheticated,
+  authorizeRoles("admin"),
+  deleteCourse
 );

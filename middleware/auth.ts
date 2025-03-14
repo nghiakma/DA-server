@@ -8,6 +8,7 @@ import { redis } from "../utils/redis";
 export const isAutheticated = CatchAsyncError(
     async (req: Request, res: Response, next: NextFunction) => {
         const access_token = req.cookies.accessToken;
+        console.log(`Access token: ${access_token}`);
         if(!access_token){
             return next(new ErrorHandler("Vui lòng đăng nhập để truy cập tài nguyên này",401));
         }

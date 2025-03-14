@@ -27,7 +27,7 @@ export const accessTokenOptions: ITokenOptions = {
     maxAge: accessTokenExpire * 60 * 60 * 1000,
     httpOnly: true,
     sameSite: "none",
-    secure: true,
+    secure: false,
 };
   
 export const refreshTokenOptions: ITokenOptions = {
@@ -35,7 +35,7 @@ export const refreshTokenOptions: ITokenOptions = {
     maxAge: refreshTokenExpire * 24 * 60 * 60 * 1000,
     httpOnly: true,
     sameSite: "none",
-    secure: true,
+    secure: false,
 };
 
 export const sendToken = (user: IUser, statusCode: number, res: Response) => {
@@ -43,13 +43,19 @@ export const sendToken = (user: IUser, statusCode: number, res: Response) => {
     const refreshToken = user.SignRefreshToken();
     // Lưu trữ phiên làm việc vào token
     redis.set(user._id as any, JSON.stringify(user) as any);
-    //  res.cookie("accessToken", accessToken, accessTokenOptions);
-    //  res.cookie("refreshToken", refreshToken, refreshTokenOptions);
+     res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      maxAge: 72 * 60 * 60 * 1000,//72h
+    });
+     res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      maxAge: 72 * 60 * 60 * 1000,//72h
+    });
     return res.status(statusCode).json({
       success: true,
       user,
-      accessToken,
-      refreshToken
+      // accessToken,
+      // refreshToken
     });
   };
   

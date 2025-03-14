@@ -21,21 +21,21 @@ const limiter = rateLimit(
   }
 );
 
+// Cấu hình CORS
+const corsOptions = {
+  origin: "http://localhost:3000", // Chỉ định nguồn gốc được phép
+  credentials: true, // Cho phép gửi cookie
+};
+app.use(cors(corsOptions));
 app.use(express.json({limit: "100mb"}));
 app.use(express.static('uploads'));
 app.use(cookieParser());
 app.use(limiter);
 
-const corsOptions = {
-  origin: 'http://localhost:3000',
-  credentials: true,
-};
-// cors => cross origin resource sharing
-app.use(cors(corsOptions));
 app.use("/api/v1", 
     userRouter,
     notificationRoute,
-    layoutRouter,
+    layoutRouter, 
     courseRouter,
     wishListRouter);
 
@@ -45,3 +45,7 @@ app.all("*", (req: Request, res: Response, next: NextFunction) => {
     next(err);
   });
   
+function morgan(arg0: string): any {
+  throw new Error("Function not implemented.");
+}
+
