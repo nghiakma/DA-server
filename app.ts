@@ -9,6 +9,7 @@ import { courseRouter } from "./routes/course.route";
 import dotenv from "dotenv";
 import { layoutRouter } from "./routes/layout.route";
 import { wishListRouter } from "./routes/wishlist.route";
+import quizzRouter from "./routes/quizz.route";
 dotenv.config();
 
 export const app = express();
@@ -37,7 +38,8 @@ app.use("/api/v1",
     notificationRoute,
     layoutRouter, 
     courseRouter,
-    wishListRouter);
+    wishListRouter,
+    quizzRouter);
 
 app.all("*", (req: Request, res: Response, next: NextFunction) => {
     const err = new Error(`Đường dẫn ${req.originalUrl} không tìm thấy`) as any;
