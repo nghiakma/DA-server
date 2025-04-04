@@ -1,57 +1,72 @@
 import express from "express";
 import {
-    activeUser,
-    createNoteByCourseDataIdOfUser,
-    deleteSingleNoteInNoteByCourseDataIdOfUser,
-    deleteUser,
-    getAllUsers,
-    getNotesByCourseDataIdOfUser,
-    getProgessOfUser,
-    getUserInfo,
-    loginUser,
-    logoutUser,
-    markChapterAsCompletedOfUser,
-    registrationUser,
-    sendCertificateAfterCourse,
-    updateAccessToken,
-    updatePassword,
-    updateProfilePicture,
-    updateSingleNoteInNoteByCourseDataIdOfUser,
-    updateUserInfo,
-    updateUserRole
-} from "../controllers/user.controller";
-import { isAutheticated,authorizeRoles } from "../middleware/auth";
-import { upload } from "../utils/multer";
+  activateUser,
+  deleteUser,
+  getAllUsers,
+  getUserInfo,
+  loginUser,
+  logoutUser,
+  registrationUser,
+  socialAuth,
+  // updateAccessToken,
+  updatePassword,
+  updateProfilePicture,
+  updateUserInfo,
+  updateUserRole,
+  getProgessOfUser,
+  markChapterAsCompletedOfUser,
+  sendCertificateAfterCourse,
 
-export const userRouter = express.Router();
+  getNotesByCourseDataIdOfUser,
+  createNoteByCourseDataIdOfUser,
+  deleteSingleNoteInNoteByCourseDataIdOfUser,
+  updateSingleNoteInNoteByCourseDataIdOfUser
+} from "../controllers/user.controller";
+import { authorizeRoles, isAutheticated } from "../middleware/auth";
+import { upload } from "../utils/multer";
+const userRouter = express.Router();
 
 userRouter.post("/registration", registrationUser);
-userRouter.post("/activate-user", activeUser);
+
+userRouter.post("/activate-user", activateUser);
+
 userRouter.post("/login", loginUser);
+
 userRouter.get("/logout", isAutheticated, logoutUser);
-userRouter.get("/refresh", updateAccessToken);
+
 userRouter.get("/me", isAutheticated, getUserInfo);
+
+// userRouter.get("/refresh", updateAccessToken);
+
+userRouter.post("/social-auth", socialAuth);
+
 userRouter.put("/update-user-info", isAutheticated, updateUserInfo);
+
 userRouter.put("/update-user-password", isAutheticated, updatePassword);
+
 userRouter.put("/update-user-avatar", isAutheticated, upload.single('avatar'), updateProfilePicture);
+
 userRouter.get(
-    "/get-users",
-    isAutheticated,
-    authorizeRoles("admin"),
-    getAllUsers
-  );
-userRouter.delete(
-    "/delete-user/:id",
-    isAutheticated,
-    authorizeRoles("admin"),
-    deleteUser
-  );
-userRouter.put(
-    "/update-user",
-    isAutheticated,
-    authorizeRoles("admin"),
-    updateUserRole
+  "/get-users",
+  isAutheticated,
+  authorizeRoles("admin"),
+  getAllUsers
 );
+
+userRouter.put(
+  "/update-user",
+  isAutheticated,
+  authorizeRoles("admin"),
+  updateUserRole
+);
+
+userRouter.delete(
+  "/delete-user/:id",
+  isAutheticated,
+  authorizeRoles("admin"),
+  deleteUser
+);
+
 
 userRouter.get(
   "/user/progress",
@@ -95,4 +110,4 @@ userRouter.put(
   isAutheticated,
   updateSingleNoteInNoteByCourseDataIdOfUser
 )
-  
+export default userRouter;
