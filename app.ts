@@ -11,6 +11,7 @@ import { layoutRouter } from "./routes/layout.route";
 import { wishListRouter } from "./routes/wishlist.route";
 import quizzRouter from "./routes/quizz.route";
 import cartRouter from "./routes/cart.route";
+import orderRouter from "./routes/order.route";
 dotenv.config();
 
 export const app = express();
@@ -41,7 +42,8 @@ app.use("/api/v1",
     courseRouter,
     wishListRouter,
     quizzRouter,
-    cartRouter);
+    cartRouter,
+    orderRouter);
 
 app.all("*", (req: Request, res: Response, next: NextFunction) => {
     const err = new Error(`Đường dẫn ${req.originalUrl} không tìm thấy`) as any;
