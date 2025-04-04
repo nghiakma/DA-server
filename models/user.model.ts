@@ -1,7 +1,11 @@
-import mongoose, {Document, Model, Schema} from "mongoose";
+require("dotenv").config();
+import mongoose, { Document, Model, Schema } from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { isEmail } from "validator";
+import { courseSchema, ICourse } from "./course.model";
+
+const emailRegexPattern: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+courseSchema
 export interface IUser extends Document {
   name: string;
   email: string;
@@ -11,64 +15,118 @@ export interface IUser extends Document {
   };
   role: string;
   isVerified: boolean;
-  courses: Array<{ courseId: mongoose.Schema.Types.ObjectId }>;
-  cart: Array<{ courseId: mongoose.Schema.Types.ObjectId }>;
+  courses: Array<{ courseId: string }>;
+  cart: Array<{ courseId: string }>;
+  notes?: Array<{
+    courseId: string,
+    courseDataId: string,
+    note: Array<{
+      subject: string,
+      content: string
+    }>
+  }>
+  progress?: Array<{
+    courseId: string,
+    chapters: Array<{
+
+      chapterId: string,
+      isCompleted: boolean
+
+    }>
+  }>;
   comparePassword: (password: string) => Promise<boolean>;
   SignAccessToken: () => string;
   SignRefreshToken: () => string;
 }
-
 const userSchema: Schema<IUser> = new mongoose.Schema(
-    {
-        name: {
-            type: String,
-            required: [true, "Vui lòng nhập tên"],
-            trim: true,
-            maxLength: [100, "Tên không được vượt quá 100 ký tự"],
-        },
-        email: {
-            type: String,
-            required: [true, "Vui lòng nhập email"],
-            unique: true,
-            validate: [isEmail, "Vui lòng nhập email hợp lệ"],
-        },
-        password: {
-            type: String,
-            required: [true, "Vui lòng nhập mật khẩu"],
-            minLength: [6, "Mật khẩu phải có ít nhất 6 ký tự"],
-            select: false,
-        },
-        avatar: {
-            url: String
-        },
-        role: {
-            type: String,
-            default: "user",
-        },
-        isVerified: {
-            type: Boolean,
-            default: false,
-        },
-        courses: [
-            {
-                courseId: {
-                    type: mongoose.Schema.Types.ObjectId,
-                    ref: "Course",
-                },
-            },
-        ],
-        cart: [
-            {
-                courseId: {
-                    type: mongoose.Schema.Types.ObjectId,
-                    ref: "Course",
-                },
-            },
-        ],
+  {
+    name: {
+      type: String,
+      required: [true, "Vui lòng nhập tên của bạn"],
     },
-    {
-        timestamps: true,
-    }
+    email: {
+      type: String,
+      required: [true, "Vui lòng nhập email của bạn"],
+      validate: {
+        validator: function (value: string) {
+          return emailRegexPattern.test(value);
+        },
+        message: "Vui lòng nhập email hợp lệ",
+      },
+      unique: true,
+    },
+    password: {
+      type: String,
+      minlength: [6, "Mật khẩu phải chứa ít nhất 6 kí tự"],
+      select: false,
+    },
+    avatar: {
+      url: String,
+    },
+    role: {
+      type: String,
+      default: "user",
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    courses: [
+      {
+        courseId: String,
+      },
+    ],
+    cart: [
+      {
+        courseId: String,
+      },
+    ],
+    notes: [
+      {
+        courseId: {
+          type: String,
+          required: false,
+        },
+        courseDataId: {
+          type: String,
+          required: false,
+        },
+        note: [
+          {
+            subject: {
+              type: String,
+              required: false
+            },
+            content: {
+              type: String,
+              required: false
+            }
+          }
+        ]
+      }
+    ],
+    progress: [
+      {
+        courseId: {
+          type: String,
+          required: false,
+        },
+        chapters: [
+          {
+            chapterId: {
+              type: String,
+              required: false,
+            },
+            isCompleted: {
+              type: Boolean,
+              default: false,
+            },
+          },
+        ],
+      },
+    ],
+  },
+  { timestamps: true }
 );
 
 /**

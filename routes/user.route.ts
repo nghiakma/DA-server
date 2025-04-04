@@ -1,15 +1,22 @@
 import express from "express";
 import {
     activeUser,
+    createNoteByCourseDataIdOfUser,
+    deleteSingleNoteInNoteByCourseDataIdOfUser,
     deleteUser,
     getAllUsers,
+    getNotesByCourseDataIdOfUser,
+    getProgessOfUser,
     getUserInfo,
     loginUser,
     logoutUser,
+    markChapterAsCompletedOfUser,
     registrationUser,
+    sendCertificateAfterCourse,
     updateAccessToken,
     updatePassword,
     updateProfilePicture,
+    updateSingleNoteInNoteByCourseDataIdOfUser,
     updateUserInfo,
     updateUserRole
 } from "../controllers/user.controller";
@@ -45,4 +52,47 @@ userRouter.put(
     authorizeRoles("admin"),
     updateUserRole
 );
+
+userRouter.get(
+  "/user/progress",
+  isAutheticated,
+  getProgessOfUser
+)
+
+userRouter.put(
+  "/user/mark-chapter",
+  isAutheticated,
+  markChapterAsCompletedOfUser
+)
+
+userRouter.post(
+  "/user/get-certificate",
+  isAutheticated,
+  sendCertificateAfterCourse
+)
+
+// NOTES
+userRouter.get(
+  "/user/get-list-notes",
+  isAutheticated,
+  getNotesByCourseDataIdOfUser
+)
+
+userRouter.post(
+  "/user/create-note-by-courseDataId",
+  isAutheticated,
+  createNoteByCourseDataIdOfUser
+)
+
+userRouter.delete(
+  "/user/delete-single-note-id-in-note",
+  isAutheticated,
+  deleteSingleNoteInNoteByCourseDataIdOfUser
+)
+
+userRouter.put(
+  "/user/update-single-note-id-in-note",
+  isAutheticated,
+  updateSingleNoteInNoteByCourseDataIdOfUser
+)
   

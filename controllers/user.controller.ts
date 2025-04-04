@@ -3,7 +3,7 @@ import userModel, { IUser } from "../models/user.model";
 import ErrorHandler from "../utils/ErrorHandler";
 import { CatchAsyncError } from "../middleware/catchAsyncErrors";
 import jwt, { JwtPayload, Secret } from "jsonwebtoken";
-import { sendMail } from "../utils/sendMail";
+import { sendMail, sendMailCertificate } from "../utils/sendMail";
 import { sendToken } from "../utils/jwt";
 import { redis } from "../utils/redis";
 import { getAllUsersService, getUserById, updateUserRoleService } from "../services/user.service";
@@ -354,3 +354,215 @@ export const updateUserRole = CatchAsyncError(
       }
     }
   );
+
+  // ======================================= CHAPTER =======================================
+  export const getProgessOfUser = CatchAsyncError(
+    async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const id = req.user?._id;
+        const response = await userModel.findById(id).select('progress');
+        res.status(200).json({
+          success: true,
+          response: response
+        })
+      } catch (error: any) {
+        return next(new ErrorHandler(error.message, 400));
+      }
+    }
+  )
+  
+  export const markChapterAsCompletedOfUser = CatchAsyncError(
+    async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const id = req.user?._id;
+        const chapterId = req.query.chapterId;
+        const courseId = req.query.courseId;
+        const user = await userModel.findById(id);
+        const progresses = user?.progress;
+        const courseProgress = progresses?.find(item => item.courseId.toString() === courseId);
+        let chapterCourse = courseProgress?.chapters.find(item => item.chapterId.toString() === chapterId);
+        if (chapterCourse) {
+          chapterCourse.isCompleted = true;
+        }
+        await user?.save();
+        res.status(200).json({
+          success: true,
+          response: chapterCourse
+        })
+      } catch (error: any) {
+        return next(new ErrorHandler(error.message, 400));
+      }
+    }
+  )
+  
+  export const sendCertificateAfterCourse = CatchAsyncError(
+    async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const user = req.user;
+        const { courseId, courseName } = req.body;
+        const mailData = {
+          course: courseName,
+          name: user?.name,
+          date: new Date().toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          }),
+        };
+  
+        try {
+          if (user) {
+            await sendMailCertificate({
+              email: user?.email,
+              subject: "Certificate of Completion",
+              template: "send-certification.ejs",
+              data: mailData,
+            });
+          }
+        } catch (error: any) {
+          return next(new ErrorHandler(error.message, 500));
+        }
+  
+        res.status(201).json({
+          succcess: true
+        })
+      } catch (error: any) {
+        return next(new ErrorHandler(error.message, 400));
+      }
+    }
+  )
+  
+  // ======================================= NOTES =======================================
+  export const getNotesByCourseDataIdOfUser = CatchAsyncError(
+    async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const userId = req.user?._id;
+        const { courseId, courseDataId } = req.query;
+        const user = await userModel.findById(userId).select('notes');
+        if (!user?.notes) {
+          return next(new ErrorHandler("Không tìm thấy danh sách ghi chú", 400));
+        }
+        const response = user.notes.find(note => note.courseId === courseId && note.courseDataId === courseDataId);
+        res.status(200).json({
+          success: true,
+          response: response
+        })
+      } catch (error: any) {
+        return next(new ErrorHandler(error.message, 400));
+      }
+    }
+  )
+  
+  export const createNoteByCourseDataIdOfUser = CatchAsyncError(
+    async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const userId = req.user?._id;
+        const { courseId, courseDataId, subject, content } = req.body;
+        const user = await userModel.findById(userId).select('notes');
+        if (!user?.notes) {
+          return next(new ErrorHandler("Không tìm thấy danh sách ghi chú", 400));
+        }
+  
+        let note: any = user.notes.find(note => note.courseId === courseId && note.courseDataId === courseDataId);
+        if (!note) {
+          note = {
+            courseId: courseId,
+            courseDataId: courseDataId,
+            note: []
+          };
+          const singleNote = {
+            subject: subject,
+            content: content
+          }
+          note.note.push(singleNote);
+          const notesFilter = user.notes.filter(note => note.courseDataId !== courseDataId);
+          user.notes = [...notesFilter, note]
+          await user.save();
+        } else {
+          let singleNote = {
+            subject: subject,
+            content: content
+          }
+          let _singleNoteHaveId = {
+            courseId: courseId,
+            courseDataId: courseDataId,
+            note: [...note.note]
+          }
+          _singleNoteHaveId.note.push(singleNote);
+          const notesFilter = user.notes.filter(note => note.courseDataId !== courseDataId);
+          user.notes = [...notesFilter, _singleNoteHaveId];
+          await user.save();
+        }
+        res.status(200).json({
+          success: true
+        })
+      } catch (error: any) {
+        return next(new ErrorHandler(error.message, 400));
+      }
+    }
+  )
+  
+  export const deleteSingleNoteInNoteByCourseDataIdOfUser = CatchAsyncError(
+    async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const userId = req.user?._id;
+        const { courseId, courseDataId, singleNoteIdInNote } = req.query;
+        const user = await userModel.findById(userId).select('notes');
+        if (!user?.notes) {
+          return next(new ErrorHandler("Không tìm thấy danh sách ghi chú", 400));
+        }
+  
+        const targetNote = user.notes.find(note => note.courseId === courseId && note.courseDataId === courseDataId);
+  
+        if (targetNote) {
+          let _cloneNote = targetNote.note.filter((item: any) => item._id.toString() !== singleNoteIdInNote);
+          let _cloneNoteOfNote = [..._cloneNote];
+          let _cloneNotes = user.notes.filter(note => note.courseDataId !== courseDataId);
+          _cloneNotes.push({
+            courseId: courseId,
+            courseDataId: courseDataId,
+            note: _cloneNoteOfNote
+          } as any)
+          user.notes = _cloneNotes;
+          await user.save();
+        }
+        res.status(200).json({
+          success: true,
+          // response: response
+        })
+      } catch (error: any) {
+        return next(new ErrorHandler(error.message, 400));
+      }
+    }
+  )
+  
+  export const updateSingleNoteInNoteByCourseDataIdOfUser = CatchAsyncError(
+    async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const userId = req.user?._id;
+        const { courseId, courseDataId, subject, content, singleNoteId } = req.body;
+        const user = await userModel.findById(userId).select('notes');
+        if (!user) {
+          return next(new ErrorHandler("Không tồn tại danh sách ghi chú", 400));
+        }
+        const targetNotes = user.notes?.find(item => item.courseId === courseId && item.courseDataId === courseDataId);
+        if (targetNotes) {
+          const index = targetNotes.note.findIndex((item: any) => item._id.toString() === singleNoteId);
+          if (index > -1) {
+            targetNotes.note[index].subject = subject;
+            targetNotes.note[index].content = content;
+          }
+          let _cloneNotes = user.notes?.filter(item => item.courseDataId !== targetNotes.courseDataId);
+          _cloneNotes?.push(targetNotes);
+          user.notes = _cloneNotes;
+          await user.save();
+        }
+        res.status(200).json({
+          success: true,
+          targetNotes
+        })
+      } catch (error: any) {
+        return next(new ErrorHandler(error.message, 400));
+      }
+    }
+  )
